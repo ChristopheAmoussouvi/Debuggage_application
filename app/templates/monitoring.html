@@ -1,0 +1,161 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Monitoring local</title>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 2rem; background: #f6f7f9; color: #1f2937; }
+      .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+      .card { background: #fff; border: 1px solid #d1d5db; border-radius: 12px; padding: 1rem; }
+      .healthy { color: #0f766e; }
+      .warning { color: #b45309; }
+      .critical { color: #b91c1c; }
+      table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; }
+      th, td { padding: .75rem; border-bottom: 1px solid #e5e7eb; text-align: left; }
+      th { background: #f3f4f6; }
+    </style>
+  </head>
+  <body>
+    <h1>Monitoring local</h1>
+    <div class="grid">
+      <div class="card">
+        <h2>Etat du service</h2>
+        <p class="{{ snapshot.service_status }}">{{ snapshot.service_status }}</p>
+      </div>
+      <div class="card">
+        <h2>Modele</h2>
+        <p>{{ snapshot.model_exists }}</p>
+        <p>{{ snapshot.model_path }}</p>
+      </div>
+      <div class="card">
+        <h2>Feedbacks</h2>
+        <p>{{ snapshot.feedback_count }}</p>
+      </div>
+      <div class="card">
+        <h2>Accuracy issue feedback</h2>
+        <p>{{ '%.2f'|format(snapshot.accuracy) }}%</p>
+      </div>
+    </div>
+
+    <h2>Seuils d'alerte</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Metrique</th>
+          <th>Seuil</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Volume de feedback utile</td>
+          <td>{{ snapshot.thresholds.feedback_volume_warning }}</td>
+        </tr>
+        <tr>
+          <td>Accuracy warning</td>
+          <td>{{ snapshot.thresholds.accuracy_warning }}%</td>
+        </tr>
+        <tr>
+          <td>Accuracy critical</td>
+          <td>{{ snapshot.thresholds.accuracy_critical }}%</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Distributions observees</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Predictions modele</h3>
+        {% if snapshot.predicted_distribution %}
+          <ul>
+            {% for label, count in snapshot.predicted_distribution.items() %}
+              <li>{{ label }} : {{ count }}</li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>Aucune donnee disponible.</p>
+        {% endif %}
+      </div>
+      <div class="card">
+        <h3>Corrections utilisateur</h3>
+        {% if snapshot.user_distribution %}
+          <ul>
+            {% for label, count in snapshot.user_distribution.items() %}
+              <li>{{ label }} : {{ count }}</li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>Aucune donnee disponible.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <h2>Alertes recentes</h2>
+    {% if alert_history %}
+    <table>
+      <thead>
+        <tr>
+          <th>Horodatage</th>
+          <th>Niveau</th>
+          <th>Accuracy</th>
+          <th>Feedbacks</th>
+          <th>Message</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for alert in alert_history %}
+        <tr>
+          <td>{{ alert.timestamp }}</td>
+          <td class="{{ alert.level }}"><strong>{{ alert.level }}</strong></td>
+          <td>{{ '%.1f'|format(alert.accuracy) }}%</td>
+          <td>{{ alert.feedback_count }}</td>
+          <td>{{ alert.message }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p>Aucune alerte emise depuis le demarrage de l'application.</p>
+    {% endif %}
+
+    <h2>Boucle de reentrainement</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Statut</h3>
+        {% if snapshot.accuracy <= snapshot.thresholds.accuracy_critical and snapshot.feedback_count >= 10 %}
+          <p class="critical"><strong>Reentrainement recommande</strong></p>
+          <p>Accuracy {{ '%.1f'|format(snapshot.accuracy) }}% — seuil {{ snapshot.thresholds.accuracy_critical }}%</p>
+        {% else %}
+          <p class="healthy">Modele performant</p>
+          <p>Accuracy {{ '%.1f'|format(snapshot.accuracy) }}% — seuil {{ snapshot.thresholds.accuracy_critical }}%</p>
+        {% endif %}
+      </div>
+      <div class="card">
+        <h3>Exporter pour reentrainement</h3>
+        <p>Declenche l'export des feedbacks en JSON puis lance <code>python retrain.py</code>.</p>
+        <form method="POST" action="/retrain/export">
+          <button type="submit" style="padding:.5rem 1rem;border-radius:6px;background:#2563eb;color:#fff;border:none;cursor:pointer;">
+            Exporter les feedbacks
+          </button>
+        </form>
+        <p style="margin-top:.5rem;font-size:.85rem;">
+          Endpoint : <a href="/retrain/status">/retrain/status</a>
+        </p>
+      </div>
+    </div>
+
+    <h2>Dashboards avances</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Flask Monitoring Dashboard</h3>
+        <p>Performance des endpoints, temps de reponse, outliers.</p>
+        <p><a href="/dashboard/">Ouvrir le dashboard</a></p>
+      </div>
+      <div class="card">
+        <h3>MLflow Tracking</h3>
+        <p>Historique des predictions, accuracy, versioning du modele.</p>
+        <p><code>mlflow ui --backend-store-uri mlruns/</code></p>
+      </div>
+    </div>
+    <p><a href="/">Retour a l'application</a></p>
+  </body>
+</html>

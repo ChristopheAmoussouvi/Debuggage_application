@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Feedback</title>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 2rem; }
+      .ok { padding: 1rem; border: 1px solid #6c6; background: #eaffea; border-radius: 10px; max-width: 520px; }
+    </style>
+  </head>
+  <body>
+    <div class="ok">
+      <h2>Feedback envoyé ✅</h2>
+      {% if user_feedback %}
+        <p><strong>Votre choix:</strong> {{ user_feedback }}</p>
+        <p><strong>Prédiction du modèle:</strong> {{ predicted_label }}</p>
+        <p><strong>Confiance:</strong> {{ '%.3f'|format(confidence) }}</p>
+        <p><strong>Sauvegarde SQLite:</strong> {{ 'OK' if feedback_saved else 'ECHEC' }}</p>
+        {% if feedback_id %}
+          <p><strong>ID feedback:</strong> {{ feedback_id }}</p>
+        {% endif %}
+      {% endif %}
+    </div>
+    <p><a href="/">↩︎ Revenir</a></p>
+  </body>
+</html>

@@ -1,0 +1,12 @@
+# Dependances CI / tests uniquement.
+# torch et keras sont exclus car le modele est mocke dans les tests
+# grace au chargement paresseux (get_model).
+flask
+flask-monitoringdashboard
+mlflow
+numpy
+pillow
+werkzeug
+pytest
+pytest-cov
+flake8

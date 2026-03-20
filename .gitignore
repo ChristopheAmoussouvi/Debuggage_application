@@ -1,0 +1,59 @@
+# Environnement virtuel Python
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Fichiers de configuration sensibles
+*.env
+.env*
+
+# Bases de données locales
+*.db
+*.sqlite3
+
+# MLflow
+mlruns/
+mlflow.db
+
+# Flask-MonitoringDashboard
+flask_monitoringdashboard.db
+
+# Modèles (trop volumineux pour Git — utiliser Git LFS si nécessaire)
+app/models/*.keras
+app/models/*.h5
+
+# Uploads utilisateur
+app/static/uploads/*
+!app/static/uploads/.placeholder
+
+# Logs
+logs/
+*.log
+app/logs/
+
+# Données de réentraînement exportées
+app/retraining_data.json
+
+# Coverage & pytest
+.coverage
+htmlcov/
+.pytest_cache/
+app/.pytest_cache/
+
+# Distribution Python
+dist/
+build/
+*.egg-info/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini

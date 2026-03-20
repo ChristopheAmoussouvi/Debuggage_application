@@ -1,0 +1,11 @@
+[flake8]
+max-line-length = 120
+exclude =
+    __pycache__,
+    htmlcov,
+    models,
+    mlruns,
+    .pytest_cache
+# E402 : os.environ['KERAS_BACKEND'] doit etre defini avant tout import Keras/PyTorch
+per-file-ignores =
+    app.py:E402

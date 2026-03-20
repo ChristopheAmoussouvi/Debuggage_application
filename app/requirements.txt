@@ -1,0 +1,12 @@
+flask
+flask-monitoringdashboard
+gunicorn
+h5py
+keras
+mlflow
+numpy
+pillow
+pytest
+torch
+werkzeug
+
